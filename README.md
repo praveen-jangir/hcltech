@@ -1,4 +1,4 @@
-# 🧠 HCL Tech Hackathon - AI Python Project
+# HCL Tech Hackathon - AI Python Project
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
@@ -8,7 +8,7 @@
 
 ---
 
-## 📑 Table of Contents
+## Table of Contents
 - [About](#-about)
 - [Workflow Architecture](#-workflow-architecture)
 - [Demo & Snapshots](#-demo--snapshots)
@@ -20,12 +20,12 @@
 
 ---
 
-## 📖 About
+## About
 This project aims to bridge the gap between complex data analysis and actionable insights using a user-friendly AI interface. It focuses on scalability, accuracy, and ease of integration.
 
 ---
 
-## 🔄 Workflow Architecture
+## Workflow Architecture
 Below is the high-level architecture of our system, designed using Miro.
 
 ![Workflow Diagram](https://via.placeholder.com/800x400?text=Insert+Miro+Workflow+Diagram+Here)
@@ -34,7 +34,7 @@ Below is the high-level architecture of our system, designed using Miro.
 
 ---
 
-## 📸 Demo & Snapshots
+## Demo & Snapshots
 See the application in action.
 
 ### Dashboard View
@@ -45,7 +45,7 @@ See the application in action.
 
 ---
 
-## ⚙️ Requirements
+## Requirements
 
 ### Prerequisites
 Before running the project, ensure you have the following installed:
@@ -63,7 +63,7 @@ See `requirements.txt` for specific versions.
 
 ---
 
-## 🛠 Sources & Tech Stack
+## Sources & Tech Stack
 We utilized a robust stack of open-source tools and libraries.
 
 | Category | Technology | Purpose |
@@ -78,7 +78,7 @@ We utilized a robust stack of open-source tools and libraries.
 
 ---
 
-## 🚀 Installation
+## Installation
 
 1. **Clone the repository**
    ```bash
@@ -86,10 +86,10 @@ We utilized a robust stack of open-source tools and libraries.
    cd hcl-hackathon-ai
    ```
 
-2. **Create a virtual environment**
+2. **Create and Activate Conda Environment**
    ```bash
-   python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   conda create -n HCL python=3.10 -y
+   conda activate HCL
    ```
 
 3. **Install dependencies**
@@ -104,7 +104,7 @@ We utilized a robust stack of open-source tools and libraries.
 
 ---
 
-## 🗓 Planning & Roadmap
+## Planning & Roadmap
 
 ### Phase 1: Planning 
 - [x] Requirement Analysis
@@ -123,7 +123,7 @@ We utilized a robust stack of open-source tools and libraries.
 
 ---
 
-## 👥 Team: Excellent Mirror
+## Team: Excellent Mirror
 | Name | Role | Email |
 | :--- | :--- | :--- |
 | **Praveen Kumar Jangir** | AI (PG) | praveen_2411ai26@iitp.ac.in |
