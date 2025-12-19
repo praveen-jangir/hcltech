@@ -7,27 +7,23 @@ function App() {
   const [activeTab, setActiveTab] = useState('Home')
   const [health, setHealth] = useState('Checking backend...')
 
-  // Upload State
   const [uploadProgress, setUploadProgress] = useState(0)
   const [isUploading, setIsUploading] = useState(false)
 
-  // Chat State
   const [chatQuery, setChatQuery] = useState('')
   const [chatHistory, setChatHistory] = useState([
     { type: 'bot', text: "Hello! I've analyzed your uploaded documents. Ask me anything!" }
   ])
   const chatWindowRef = useRef(null)
 
-  // Modal State
   const [modal, setModal] = useState({ show: false, message: '', type: 'success' })
 
   useEffect(() => {
     axios.get('/api/health')
       .then(res => setHealth(res.data.message))
-      .catch(err => setHealth('Backend offline ⚠️'))
+      .catch(err => setHealth('Backend offline'))
   }, [])
 
-  // Auto-scroll chat
   useEffect(() => {
     if (chatWindowRef.current) {
       chatWindowRef.current.scrollTop = chatWindowRef.current.scrollHeight
@@ -63,20 +59,22 @@ function App() {
   const handleSend = () => {
     if (!chatQuery.trim()) return
 
-    // Add User Message
     const userMsg = { type: 'user', text: chatQuery }
     setChatHistory(prev => [...prev, userMsg])
     const currentQuery = chatQuery
-    setChatQuery('') // Clear input
+    setChatQuery('')
 
-    // Call API
     axios.post('/api/ask', { query: currentQuery })
       .then(res => {
-        const botMsg = { type: 'bot', text: res.data.answer }
+        const botMsg = {
+          type: 'bot',
+          internal: res.data.internal,
+          external: res.data.external
+        }
         setChatHistory(prev => [...prev, botMsg])
       })
       .catch(err => {
-        const errorMsg = { type: 'bot', text: "Sorry, I encountered an error answering that." }
+        const errorMsg = { type: 'error', text: "Sorry, I encountered an error answering that." }
         setChatHistory(prev => [...prev, errorMsg])
         console.error(err)
       })
@@ -84,9 +82,21 @@ function App() {
 
   const closeModal = () => setModal({ ...modal, show: false })
 
+  // Config State
+  const [externalUrl, setExternalUrl] = useState('')
+
+  const updateUrl = () => {
+    if (!externalUrl) return
+    axios.post('/api/set-url', { url: externalUrl })
+      .then(res => {
+        setModal({ show: true, message: 'External URL Updated!', type: 'success' })
+        setExternalUrl('')
+      })
+      .catch(err => setModal({ show: true, message: 'Failed to update URL', type: 'error' }))
+  }
+
   return (
     <div className="app-container">
-      {/* Navigation */}
       <nav className="navbar">
         <div className="nav-items">
           <button onClick={() => setActiveTab('Home')} className={activeTab === 'Home' ? 'active' : ''}>
@@ -100,17 +110,25 @@ function App() {
           </button>
         </div>
         <div className="nav-status">
+          <div className="url-config">
+            <input
+              type="text"
+              placeholder="Update Model URL..."
+              value={externalUrl}
+              onChange={(e) => setExternalUrl(e.target.value)}
+            />
+            <button onClick={updateUrl}>Save</button>
+          </div>
           <span className="status-badge">{health}</span>
         </div>
       </nav>
 
-      {/* Content */}
       <main className="content">
         {activeTab === 'Home' && (
           <div className="home-view">
             <div className="hero-section">
               <div className="hero-content">
-                <h1>Excellent Mirror 🔮</h1>
+                <h1>Excellent Mirror</h1>
                 <p>Advanced AI Solution | HCL Tech Hackathon</p>
                 <div className="hero-image-container">
                   <img src="/assets/images/team.png" alt="Team Hero" className="hero-img" />
@@ -128,12 +146,11 @@ function App() {
         {activeTab === 'Dashboard' && (
           <div className="dashboard-view">
             <div className="dashboard-header">
-              <h1>RAG Document Assistant 🤖</h1>
+              <h1>Rag based document assistant</h1>
               <p className="subtitle">Upload documents and ask questions instantly.</p>
             </div>
 
             <div className="rag-container">
-              {/* File Uploader */}
               <div className="upload-section">
                 <div className="section-title">
                   <UploadCloud size={24} /> Upload Documents
@@ -141,12 +158,9 @@ function App() {
 
                 <div className="upload-box">
                   <input type="file" id="fileInput" onChange={handleUpload} />
-                  <div className="upload-icon">📂</div>
                   <div className="upload-text">Drag & Drop or Click to Upload</div>
                   <div className="upload-hint">Supported: PDF, IMG, DOC, TXT</div>
                 </div>
-
-                {/* Progress Bar */}
                 {isUploading && (
                   <div className="progress-container">
                     <div className="progress-bar">
@@ -157,15 +171,52 @@ function App() {
                 )}
               </div>
 
-              {/* Chat Interface */}
+
               <div className="chat-section">
                 <div className="section-title">
-                  <h3>💬 Ask AI</h3>
+                  <h3>Ask any thing from files</h3>
                 </div>
                 <div className="chat-window" ref={chatWindowRef}>
                   {chatHistory.map((msg, index) => (
-                    <div key={index} className={`message ${msg.type === 'user' ? 'user-message' : 'bot-message'}`}>
-                      {msg.text}
+                    <div key={index} className={`message-wrapper ${msg.type}`}>
+                      {msg.type === 'user' ? (
+                        <div className="user-message card-shadow">
+                          {msg.text}
+                        </div>
+                      ) : msg.type === 'error' ? (
+                        <div className="error-message">{msg.text}</div>
+                      ) : (
+                        <div className="comparison-container">
+                          <div className="model-card internal-model">
+                            <div className="model-header">
+                              <span className="badge internal">⚡ Internal Model</span>
+                            </div>
+                            <div className="model-body">
+                              {msg.internal?.answer || "No response"}
+                            </div>
+                            {msg.internal?.metrics && (
+                              <div className="metrics-box">
+                                <div className="metrics-grid">
+                                  <span title="Cosine">Cosine: {msg.internal.metrics.cosine_similarity}</span>
+                                  <span title="ROUGE">ROUGE: {msg.internal.metrics.rouge_1}</span>
+                                  <span title="BLEU">BLEU: {msg.internal.metrics.bleu}</span>
+                                  <span title="MRR">MRR: {msg.internal.metrics.mrr}</span>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="model-card external-model">
+                            <div className="model-header">
+                              <span className="badge external">runing in gpu model name is deberta-v3-large</span>
+                            </div>
+                            <div className="model-body">
+                              {msg.external?.answer || "No response received."}
+                            </div>
+
+                          </div>
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -187,7 +238,6 @@ function App() {
         )}
       </main>
 
-      {/* Custom Modal */}
       {modal.show && (
         <div className="modal-overlay">
           <div className={`modal-content ${modal.type}`}>

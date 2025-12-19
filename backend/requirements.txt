@@ -5,3 +5,10 @@ pandas
 numpy
 scikit-learn
 werkzeug==2.3.8
+google-generativeai
+pypdf
+chromadb
+pymongo
+rouge-score
+nltk
+scikit-learn
