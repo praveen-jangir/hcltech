@@ -28,7 +28,11 @@ The system accepts questions in a natural language (English) from the end user f
 ## Architecture
 This project utilizes a sophisticated pipeline to process documents and generate accurate responses.
 
+### System Architecture
 ![System Architecture](public/assets/images/architecture.jpg)
+
+### Data Flow
+![Data Flow](public/assets/images/data_flow.jpg)
 
 ### Workflow
 1. **Document Processing**: `Pdf_doc` → **Txt_Extractor** → `Raw_Txt` + `URL to Images` (embeds images and associates with related text).
@@ -47,6 +51,7 @@ This project utilizes a sophisticated pipeline to process documents and generate
 ### Architectural Highlights
 - **Hybrid LLM Support**: Supports both online API calls to the LLM (**GEMINI**) and offline LLM (**OLLAMA**) for privacy of sensitive documents.
 - **Multi-Database Support**: Capable of handling multiple different databases simultaneously, each with options to choose the LLM preference.
+- **Microservices Design**: Decoupled architecture using **Node.js** for the frontend UI and **Flask** for the backend API.
 
 ### User Centric Design
 1. **Select Database**: Choose the specific knowledge base.
@@ -65,14 +70,15 @@ We find the numerical metrics (**MRR**, **Recall@2**, **Recall@5**, **ROUGE-1**,
 
 ### Prerequisites
 - **OS**: macOS / Linux / Windows
-- **Python**: version 3.10 or higher
+- **Python**: version 3.10 or higher (for Flask API)
+- **Node.js**: version 18+ (for UI)
 - **Git**: for version control
 - **Ollama** (optional, for local LLM support)
 
 ### Python Dependencies
 See `requirements.txt` for specific versions.
-- `streamlit` (UI Framework)
-- `streamlit-option-menu` (Navigation)
+- `flask`
+- `flask-cors`
 - `pandas`, `numpy` (Data Processing)
 - `scikit-learn` (ML Utilities)
 - `matplotlib`, `seaborn` (Visualization)
@@ -82,8 +88,8 @@ See `requirements.txt` for specific versions.
 ## Tech Stack
 | Category | Technology | Purpose |
 | :--- | :--- | :--- |
-| **Language** | Python | Core logic and ML implementation |
-| **Frontend** | Streamlit | Interactive web application |
+| **Backend** | Python (Flask) | RESTful API and ML Logic |
+| **Frontend** | Node.js | Interactive User Interface |
 | **LLMs** | Gemini, Ollama | Natural Language Processing |
 | **Vector DB** | FAISS | Semantic Search Indexing |
 | **Data Processing** | Pandas, NumPy | Data manipulation |
