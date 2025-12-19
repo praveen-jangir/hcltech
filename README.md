@@ -48,51 +48,38 @@ This project utilizes a sophisticated pipeline to process documents and generate
 
 ## Key Features
 
-### Architectural Highlights
-- **Hybrid LLM Support**: Supports both online API calls to the LLM (**GEMINI**) and offline LLM (**OLLAMA**) for privacy of sensitive documents.
-- **Multi-Database Support**: Capable of handling multiple different databases simultaneously, each with options to choose the LLM preference.
-- **Microservices Design**: Decoupled architecture using **Node.js** for the frontend UI and **Flask** for the backend API.
+### 🚀 Dual-Model RAG Architecture
+- **Internal Model**: Custom RAG pipeline using Google Gemini 2.0 Flash, ChromaDB, and Query Rewriting.
+- **External Model Integration**: Real-time parallel querying of an external RAG system (hosted via ngrok) for cross-verification.
+- **Dynamic Configuration**: Hot-swappable external API URL directly from the Dashboard UI.
 
-### User Centric Design
-1. **Select Database**: Choose the specific knowledge base.
-2. **Select LLM Source**: Toggle between online (Gemini) and offline (Ollama) models.
-3. **Knowledge Management**: Option to add more documents or query the existing knowledge base.
-4. **Natural Language Interface**: 
-    - If **Query** selected: Returns a natural language response.
-    - If **Add Document** selected: Provides interface to upload and index new documents.
+### 📊 Advanced Evaluation Metrics
+Real-time quality assessment for every internal RAG response:
+- **Cosine Similarity**: Semantic grounding score.
+- **ROUGE-1 / BLEU**: Text overlap and n-gram precision metrics.
+- **MRR (Mean Reciprocal Rank)**: Retrieval quality score.
 
-### Evaluation Metrics
-We find the numerical metrics (**MRR**, **Recall@2**, **Recall@5**, **ROUGE-1**, and **BLEU**) for evaluating the system performance.
+### 📂 Multi-Format Document Support
+Intelligent processing pipeline for diverse inputs:
+- **PDF & Text**: Standard extraction.
+- **OCR Engine**: Standardized text extraction from **Images** (`.png`, `.jpg`).
+- **Office Docs**: Native parsing for **Word** (`.docx`), **Excel** (`.xlsx`), and **PowerPoint** (`.pptx`).
 
----
-
-## Requirements
-
-### Prerequisites
-- **OS**: macOS / Linux / Windows
-- **Python**: version 3.10 or higher (for Flask API)
-- **Node.js**: version 18+ (for UI)
-- **Git**: for version control
-- **Ollama** (optional, for local LLM support)
-
-### Python Dependencies
-See `requirements.txt` for specific versions.
-- `flask`
-- `flask-cors`
-- `pandas`, `numpy` (Data Processing)
-- `scikit-learn` (ML Utilities)
-- `matplotlib`, `seaborn` (Visualization)
+### 💻 Modern Stack
+- **Frontend**: **React + Vite** for a responsive, card-based comparison UI.
+- **Backend**: **Flask-RESTx** for Swagger documentation and robust API handling.
 
 ---
 
 ## Tech Stack
 | Category | Technology | Purpose |
 | :--- | :--- | :--- |
-| **Backend** | Python (Flask) | RESTful API and ML Logic |
-| **Frontend** | React.js | Interactive User Interface |
-| **LLMs** | Gemini, Ollama | Natural Language Processing |
-| **Vector DB** | FAISS | Semantic Search Indexing |
-| **Data Processing** | Pandas, NumPy | Data manipulation |
+| **Backend** | **Python (Flask)** | REST API, Orchestration, RAG Pipeline |
+| **Frontend** | **React.js + Vite** | High-performance Client UI with Dual Cards |
+| **LLMs** | **Gemini 2.0 Flash** | Query Rewriting, Answer Generation, Eval |
+| **Vector DB** | **ChromaDB** | Semantic Search & Document Storage |
+| **OCR/Parsing** | **Tesseract, Pandas** | Image & Tabular Data Extraction |
+| **Database** | **MongoDB** | Chat History & Upload Logs |
 
 ---
 
