@@ -53,7 +53,6 @@ if not os.path.exists(UPLOAD_FOLDER):
 class Upload(Resource):
     @ns.doc('upload_file')
     def post(self):
-        """Handle file uploads - Local + External"""
         if 'file' not in request.files:
             return {'error': 'No file part'}, 400
         
@@ -92,7 +91,6 @@ class Upload(Resource):
 class Ask(Resource):
     @ns.doc('ask_question')
     def post(self):
-        """Dual RAG: Query Local + External Models"""
         data = request.json
         query = data.get('query')
         
@@ -141,7 +139,6 @@ class Ask(Resource):
 class SetURL(Resource):
     @ns.doc('set_external_url')
     def post(self):
-        """Update the External Model Base URL"""
         data = request.json
         new_url = data.get('url')
         if not new_url:
