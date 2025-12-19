@@ -73,6 +73,37 @@ button.active {
   box-shadow: 0 4px 12px rgba(0, 191, 255, 0.3);
 }
 
+.nav-status {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.url-config {
+  display: flex;
+  gap: 0.5rem;
+  background: rgba(0, 0, 0, 0.03);
+  padding: 4px;
+  border-radius: 20px;
+}
+
+.url-config input {
+  border: none;
+  background: transparent;
+  padding: 4px 10px;
+  font-size: 0.8rem;
+  width: 180px;
+  outline: none;
+}
+
+.url-config button {
+  padding: 4px 12px;
+  font-size: 0.75rem;
+  background: var(--primary);
+  color: white;
+  border-radius: 15px;
+}
+
 .status-badge {
   font-size: 0.75rem;
   padding: 0.3rem 0.8rem;

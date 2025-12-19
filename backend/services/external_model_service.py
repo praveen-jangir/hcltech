@@ -3,8 +3,13 @@ import requests
 import os
 
 class ExternalModelService:
-    def __init__(self, base_url="https://a30a8491712b.ngrok-free.app"):
+    def __init__(self, base_url="https://30891ef1ec5d.ngrok-free.app"):
         self.base_url = base_url
+
+    def set_base_url(self, new_url):
+        """Updates the base URL for the external model."""
+        self.base_url = new_url.rstrip('/')
+        print(f"External Model URL updated to: {self.base_url}")
 
     def upload_file(self, filepath):
         url = f"{self.base_url}/upload_pdf"

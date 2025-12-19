@@ -17,10 +17,9 @@ class Health(Resource):
     @ns.doc('health_check')
     def get(self):
         """Health check endpoint"""
-        return {'status': 'healthy', 'message': 'Excellent Mirror Backend is running! 🚀'}
+        return {'status': 'healthy', 'message': 'Excellent Mirror Backend is runninng'}
 
 
-# RAG Configuration
 UPLOAD_FOLDER = 'uploads'
 from flask import Flask, request, jsonify
 from flask_restx import Api, Resource, fields
@@ -29,23 +28,19 @@ import os
 from pymongo import MongoClient
 from datetime import datetime
 
-# Import Services
 from services.document_processor import DocumentProcessor
 from services.vector_store import VectorStore
 from services.llm_engine import LLMEngine
 from services.evaluation_service import EvaluationService
 from services.external_model_service import ExternalModelService
 
-# Configuration
 GEMINI_API_KEY = "AIzaSyDLqhoMwfr2VFIPH3UlouR-xF60PhG_CwQ"
 
-# Initialize Services
 vector_store = VectorStore(api_key=GEMINI_API_KEY)
 llm_engine = LLMEngine(api_key=GEMINI_API_KEY)
 evaluation_service = EvaluationService(api_key=GEMINI_API_KEY)
-external_service = ExternalModelService() # Uses default ngrok URL
+external_service = ExternalModelService()
 
-# Configure MongoDB
 mongo_client = MongoClient("mongodb://localhost:27017/")
 db = mongo_client["hcl_tech_rag"]
 uploads_col = db["uploads"]
@@ -72,17 +67,14 @@ class Upload(Resource):
             file.save(filepath)
             
             try:
-                # 1. Local Processing
                 extracted_text = DocumentProcessor.extract_text(filepath)
                 chunks = DocumentProcessor.chunk_text(extracted_text)
                 vector_store.add_documents(chunks, filename)
                 
-                # 2. External Processing (Upload to other server)
                 print("Uploading to external model...")
                 ext_response = external_service.upload_file(filepath)
                 print(f"External Upload Response: {ext_response}")
 
-                # 3. Log to MongoDB
                 uploads_col.insert_one({
                     "filename": filename,
                     "upload_time": datetime.utcnow(),
@@ -108,18 +100,15 @@ class Ask(Resource):
             return {'error': 'No query provided'}, 400
             
         try:
-            # --- Model 1: Internal Advanced RAG ---
             rewritten_query = llm_engine.rewrite_query(query)
             context = vector_store.query_documents(rewritten_query)
             answer_internal = llm_engine.generate_answer(query, context)
             metrics_internal = evaluation_service.evaluate_all(query, context, answer_internal)
             
-            # --- Model 2: External RAG ---
             print("Querying external model...")
             ext_data = external_service.ask_question(query)
             answer_external = ext_data.get('answer', 'No answer from external model')
             
-            # Log to MongoDB
             chats_col.insert_one({
                 "query": query,
                 "internal": {
@@ -147,6 +136,19 @@ class Ask(Resource):
             
         except Exception as e:
              return {'error': f'Dual RAG Error: {str(e)}'}, 500
+
+@ns.route('/set-url')
+class SetURL(Resource):
+    @ns.doc('set_external_url')
+    def post(self):
+        """Update the External Model Base URL"""
+        data = request.json
+        new_url = data.get('url')
+        if not new_url:
+            return {'error': 'URL is required'}, 400
+            
+        external_service.set_base_url(new_url)
+        return {'message': f'External URL updated to {new_url}'}, 200
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

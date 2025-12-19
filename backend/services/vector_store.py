@@ -8,8 +8,6 @@ class VectorStore:
     def __init__(self, api_key, collection_name="documents", db_path="./chroma_db"):
         genai.configure(api_key=api_key)
         self.chroma_client = chromadb.PersistentClient(path=db_path)
-        
-        # Custom Gemini Embedding Function
         self.embedding_fn = self._create_gemini_ef()
         self.collection = self.chroma_client.get_or_create_collection(
             name=collection_name, 
@@ -17,7 +15,6 @@ class VectorStore:
         )
 
     def _create_gemini_ef(self):
-        """Creates the custom embedding function wrapper."""
         class GeminiEmbeddingFunction(embedding_functions.EmbeddingFunction):
             def __call__(self, input: list[str]) -> list[list[float]]:
                 embeddings = []
@@ -37,7 +34,6 @@ class VectorStore:
         return GeminiEmbeddingFunction()
 
     def add_documents(self, chunks, filename):
-        """Adds text chunks to the vector store."""
         current_time = str(time.time())
         ids = [f"{filename}_{i}_{current_time}" for i in range(len(chunks))]
         metadatas = [{"source": filename, "chunk_index": i} for i in range(len(chunks))]
@@ -50,12 +46,10 @@ class VectorStore:
         return len(chunks)
 
     def query_documents(self, query, n_results=3):
-        """Queries the vector store for relevant context."""
         results = self.collection.query(
             query_texts=[query],
             n_results=n_results
         )
-        # Flatten documents list
         if results['documents']:
              return "\n".join(results['documents'][0])
         return ""

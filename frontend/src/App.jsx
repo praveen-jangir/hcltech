@@ -82,6 +82,19 @@ function App() {
 
   const closeModal = () => setModal({ ...modal, show: false })
 
+  // Config State
+  const [externalUrl, setExternalUrl] = useState('')
+
+  const updateUrl = () => {
+    if (!externalUrl) return
+    axios.post('/api/set-url', { url: externalUrl })
+      .then(res => {
+        setModal({ show: true, message: 'External URL Updated!', type: 'success' })
+        setExternalUrl('')
+      })
+      .catch(err => setModal({ show: true, message: 'Failed to update URL', type: 'error' }))
+  }
+
   return (
     <div className="app-container">
       <nav className="navbar">
@@ -97,6 +110,15 @@ function App() {
           </button>
         </div>
         <div className="nav-status">
+          <div className="url-config">
+            <input
+              type="text"
+              placeholder="Update Model URL..."
+              value={externalUrl}
+              onChange={(e) => setExternalUrl(e.target.value)}
+            />
+            <button onClick={updateUrl}>Save</button>
+          </div>
           <span className="status-badge">{health}</span>
         </div>
       </nav>

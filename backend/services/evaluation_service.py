@@ -13,7 +13,6 @@ class EvaluationService:
         self.scorer = rouge_scorer.RougeScorer(['rouge1', 'rougeL'], use_stemmer=True)
 
     def get_embedding(self, text):
-        """Generates embedding for a single string."""
         try:
             result = genai.embed_content(
                 model="models/embedding-001",
@@ -27,18 +26,14 @@ class EvaluationService:
             return [0.0] * 768
 
     def calculate_cosine_similarity(self, text1, text2):
-        """Calculates cosine similarity between two texts."""
         vec1 = np.array(self.get_embedding(text1)).reshape(1, -1)
         vec2 = np.array(self.get_embedding(text2)).reshape(1, -1)
         return float(cosine_similarity(vec1, vec2)[0][0])
 
     def calculate_rouge_bleu(self, reference, hypothesis):
-        """Calculates ROUGE and BLEU scores."""
-        # ROUGE
         scores = self.scorer.score(reference, hypothesis)
         rouge1 = scores['rouge1'].fmeasure
         
-        # BLEU (Simple unigram overlap for now)
         reference_tokens = [reference.split()]
         hypothesis_tokens = hypothesis.split()
         bleu = sentence_bleu(reference_tokens, hypothesis_tokens, weights=(1, 0, 0, 0))
@@ -46,10 +41,6 @@ class EvaluationService:
         return rouge1, bleu
 
     def evaluate_retrieval(self, query, retrieved_docs):
-        """
-        Uses LLM to judge relevance of retrieved docs to calculate MRR and Recall.
-        retrieved_docs: list of text chunks
-        """
         prompt = f"""
         You are a search quality evaluator.
         Query: {query}
@@ -64,16 +55,14 @@ class EvaluationService:
             response = self.model.generate_content(prompt)
             relevance_scores = json.loads(response.text.replace('```json', '').replace('```', '').strip())
         except Exception:
-            relevance_scores = [0] * len(retrieved_docs) # Fallback
+            relevance_scores = [0] * len(retrieved_docs)
             
-        # Calculate MRR (Mean Reciprocal Rank) - only for this single query
         mrr = 0
         for i, score in enumerate(relevance_scores):
             if score == 1:
                 mrr = 1 / (i + 1)
                 break
                 
-        # Calculate Precision@K (e.g., K=len(docs))
         relevant_count = sum(relevance_scores)
         precision_at_k = relevant_count / len(retrieved_docs) if retrieved_docs else 0
         
@@ -84,16 +73,9 @@ class EvaluationService:
         }
 
     def evaluate_all(self, query, context, answer):
-        """Orchestrates all evaluations."""
-        # 1. Cosine Similarity (Grounding: Answer vs Context)
         cosine_sim = self.calculate_cosine_similarity(answer, context)
         
-        # 2. ROUGE/BLEU (Answer vs Context overlap - checking extraction quality)
         rouge, bleu = self.calculate_rouge_bleu(context, answer)
-        
-        # 3. Retrieval Quality (Simulated for this context chunk)
-        # Note: 'context' is typically a joined string of chunks. 
-        # For true retrieval eval, we'd need the list. Here we approximate.
         retrieval_metrics = self.evaluate_retrieval(query, [context])
         
         return {
