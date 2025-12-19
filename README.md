@@ -89,7 +89,7 @@ See `requirements.txt` for specific versions.
 | Category | Technology | Purpose |
 | :--- | :--- | :--- |
 | **Backend** | Python (Flask) | RESTful API and ML Logic |
-| **Frontend** | Node.js | Interactive User Interface |
+| **Frontend** | React.js | Interactive User Interface |
 | **LLMs** | Gemini, Ollama | Natural Language Processing |
 | **Vector DB** | FAISS | Semantic Search Indexing |
 | **Data Processing** | Pandas, NumPy | Data manipulation |
