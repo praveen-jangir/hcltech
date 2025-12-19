@@ -35,8 +35,8 @@ This project utilizes a sophisticated pipeline to process documents and generate
 ![Data Flow](public/assets/images/data_flow.jpg)
 
 ### Workflow
-1. **Document Processing**: `Pdf_doc` → **Txt_Extractor** → `Raw_Txt` + `URL to Images` (embeds images and associates with related text).
-2. **Embedding**: `Raw_Text` + `Image_URL` → **Embedding_FAISS_Indexing** → `Semantic Vector_Store`.
+1. **Document Processing**: `Pdf_doc` → **Txt_Extractor** → `Raw_Txt` (does OCR if length of extracted text is less than a predefined threshold).
+2. **Embedding**: `Extracted_information` → **Embedding_FAISS_Indexing** → `Semantic Vector_Store`.
 3. **Query Processing**: `User_Query` → **LLM** → `Summerized_txt_for_Semantic_Search`.
 4. **Retrieval**: `Summerized_TXT` → **Vector_Query_Top_K** → `Top_Related_Documents`.
 5. **Response Generation**: `Top_Related_Documents` → **LLM** → `Human_Friendly_Response`.
