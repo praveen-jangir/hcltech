@@ -2,7 +2,7 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
-[![Status](https://img.shields.io/badge/status-planning-orange.svg)]()
+[![Status](https://img.shields.io/badge/status-execution-green.svg)]()
 
 > A cutting-edge AI solution designed for the HCL Tech Hackathon, leveraging Python to solve real-world problems through advanced machine learning algorithms.
 
@@ -10,71 +10,89 @@
 
 ## Table of Contents
 - [About](#-about)
-- [Workflow Architecture](#-workflow-architecture)
-- [Demo & Snapshots](#-demo--snapshots)
+- [Architecture](#-architecture)
 - [Key Features](#-key-features)
 - [Requirements](#-requirements)
-- [Sources & Tech Stack](#-sources--tech-stack)
+- [Tech Stack](#-tech-stack)
 - [Installation](#-installation)
-- [Planning & Roadmap](#-planning--roadmap)
+- [Usage](#-usage)
+- [Team](#-team)
 
 ---
 
 ## About
-This project aims to bridge the gap between complex data analysis and actionable insights using a user-friendly AI interface. It focuses on scalability, accuracy, and ease of integration.
+The system accepts questions in a natural language (English) from the end user for the implied knowledge base to answer and resolve queries from the horde of PDF documents collected from open sources and fed to the system. The architecture supports any computer-readable PDF document and provides smart answers in natural language. The system provides answers to any query that is part of the knowledge base and ensures no outside knowledge invades the generated response.
 
 ---
 
-## Workflow Architecture
-Below is the high-level architecture of our system, designed using Miro.
+## Architecture
+This project utilizes a sophisticated pipeline to process documents and generate accurate responses.
 
-![Workflow Diagram](https://via.placeholder.com/800x400?text=Insert+Miro+Workflow+Diagram+Here)
+### System Architecture
+![System Architecture](public/assets/images/architecture.jpg)
 
-*Figure 1: System Data Flow and Component Interaction*
+### Data Flow
+![Data Flow](public/assets/images/data_flow.jpg)
+
+### Workflow
+1. **Document Processing**: `Pdf_doc` → **Txt_Extractor** → `Raw_Txt` (does OCR if length of extracted text is less than a predefined threshold).
+2. **Embedding**: `Extracted_information` → **Embedding_FAISS_Indexing** → `Semantic Vector_Store`.
+3. **Query Processing**: `User_Query` → **LLM** → `Summerized_txt_for_Semantic_Search`.
+4. **Retrieval**: `Summerized_TXT` → **Vector_Query_Top_K** → `Top_Related_Documents`.
+5. **Response Generation**: `Top_Related_Documents` → **LLM** → `Human_Friendly_Response`.
+6. **Evaluation Set Creation**.
+7. **Testing**: Ensuring proper knowledge extraction and knowledge base exclusive response extraction.
+8. **Metrics**: Finding numerical evaluation metrics for evaluating system capability.
 
 ---
 
-## Demo & Snapshots
-See the application in action.
+## Key Features
 
-### Dashboard View
-![Dashboard Screenshot](https://via.placeholder.com/800x400?text=Dashboard+Snapshot)
+### Architectural Highlights
+- **Hybrid LLM Support**: Supports both online API calls to the LLM (**GEMINI**) and offline LLM (**OLLAMA**) for privacy of sensitive documents.
+- **Multi-Database Support**: Capable of handling multiple different databases simultaneously, each with options to choose the LLM preference.
+- **Microservices Design**: Decoupled architecture using **Node.js** for the frontend UI and **Flask** for the backend API.
 
-### Prediction Output
-![Prediction Screenshot](https://via.placeholder.com/800x400?text=Prediction+Output)
+### User Centric Design
+1. **Select Database**: Choose the specific knowledge base.
+2. **Select LLM Source**: Toggle between online (Gemini) and offline (Ollama) models.
+3. **Knowledge Management**: Option to add more documents or query the existing knowledge base.
+4. **Natural Language Interface**: 
+    - If **Query** selected: Returns a natural language response.
+    - If **Add Document** selected: Provides interface to upload and index new documents.
+
+### Evaluation Metrics
+We find the numerical metrics (**MRR**, **Recall@2**, **Recall@5**, **ROUGE-1**, and **BLEU**) for evaluating the system performance.
 
 ---
 
 ## Requirements
 
 ### Prerequisites
-Before running the project, ensure you have the following installed:
 - **OS**: macOS / Linux / Windows
-- **Python**: version 3.10 or higher
+- **Python**: version 3.10 or higher (for Flask API)
+- **Node.js**: version 18+ (for UI)
 - **Git**: for version control
+- **Ollama** (optional, for local LLM support)
 
 ### Python Dependencies
 See `requirements.txt` for specific versions.
-- `numpy`
-- `pandas`
-- `scikit-learn` / `tensorflow` / `pytorch`
-- `streamlit` or `flask` (for UI)
-- `matplotlib` / `seaborn` (for visualization)
+- `flask`
+- `flask-cors`
+- `pandas`, `numpy` (Data Processing)
+- `scikit-learn` (ML Utilities)
+- `matplotlib`, `seaborn` (Visualization)
 
 ---
 
-## Sources & Tech Stack
-We utilized a robust stack of open-source tools and libraries.
-
+## Tech Stack
 | Category | Technology | Purpose |
 | :--- | :--- | :--- |
-| **Language** | Python | Core logic and ML implementation |
-| **ML Framework** | Scikit-learn / TensorFlow | Model training and inference |
-| **Data Processing** | Pandas, NumPy | Data manipulation and analysis |
-| **Visualization** | Matplotlib, Seaborn | Generating insights charts |
-| **Web Framework** | Streamlit | Interactive web application |
-| **Design/Planning**| Miro | Workflow and architecture design |
-| **Version Control**| Git & GitHub | Source code management |
+| **Backend** | Python (Flask) | RESTful API and ML Logic |
+| **Frontend** | React.js | Interactive User Interface |
+| **LLMs** | Gemini, Ollama | Natural Language Processing |
+| **Vector DB** | FAISS | Semantic Search Indexing |
+| **Data Processing** | Pandas, NumPy | Data manipulation |
 
 ---
 
@@ -86,7 +104,7 @@ We utilized a robust stack of open-source tools and libraries.
    cd hcl-hackathon-ai
    ```
 
-2. **Create and Activate Conda Environment**
+2. **Create Environment**
    ```bash
    conda create -n HCL python=3.10 -y
    conda activate HCL
@@ -104,22 +122,8 @@ We utilized a robust stack of open-source tools and libraries.
 
 ---
 
-## Planning & Roadmap
-
-### Phase 1: Planning 
-- [x] Requirement Analysis
-- [x] Feasibility Study
-- [ ] Workflow Design (Miro)
-
-### Phase 2: Design
-- [ ] System Architecture
-- [ ] UI/UX Wireframing
-- [ ] Database Schema
-
-### Phase 3: Development
-- [ ] Data Preprocessing Pipeline
-- [ ] Model Training & Tuning
-- [ ] API/Frontend Integration
+## Testing
+We utilize personally handcrafted documents containing imaginary information for verification. This ensures that the end response is indeed only extracted from the knowledge base and no outside information invades the generated response, even after parsing through a SOTA LLM.
 
 ---
 

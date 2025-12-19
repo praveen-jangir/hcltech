@@ -1,3 +1,7 @@
-flask
-flask-restx
-gunicorn
+streamlit
+pandas
+numpy
+scikit-learn
+matplotlib
+seaborn
+streamlit-option-menu
