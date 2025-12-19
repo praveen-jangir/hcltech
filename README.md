@@ -107,8 +107,17 @@ Intelligent processing pipeline for diverse inputs:
    streamlit run app.py
    ```
 
----
+## Usage & Demo
+Upload any PDF document and start chatting. The system provides transparency by distinguishing between Internal (Our RAG) and External models.
 
+### 🖼️ Demo Screenshots
+![Demo Chat 1](public/assets/images/demo_screenshot_1.png)
+*Asking specific questions about the uploaded story.*
+
+![Demo Chat 2](public/assets/images/demo_screenshot_2.png)
+*System handling questions outside the PDF context.*
+
+> **⚠️ Important Check**: As shown in the results above, if we ask questions **out of the PDF's context**, the system strictly **will not answer**. It ensures responses are exclusively grounded in the provided knowledge base.
 
 ---
 
