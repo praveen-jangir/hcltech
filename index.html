@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>PDF Upload & Ask Question</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 40px auto;
+        }
+
+        input,
+        button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+        }
+
+        #questionSection {
+            display: none;
+            margin-top: 30px;
+        }
+
+        #response {
+            margin-top: 20px;
+            padding: 10px;
+            background: #f4f4f4;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2>Upload PDF</h2>
+
+    <input type="file" id="fileInput" />
+    <button onclick="uploadFile()">Upload</button>
+
+    <div id="questionSection">
+        <h2>Ask Question</h2>
+        <input type="text" id="questionInput" placeholder="Enter your question" />
+        <button onclick="askQuestion()">Ask</button>
+
+        <div id="response"></div>
+    </div>
+
+    <script>
+        async function uploadFile() {
+            const fileInput = document.getElementById("fileInput");
+            const file = fileInput.files[0];
+
+            if (!file) {
+                alert("Please select a file");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append("file", file); // POST file name
+
+            try {
+                const res = await fetch(
+                    "https://6b8ce6bdd3de.ngrok-free.app/upload_pdf",
+                    {
+                        method: "POST",
+                        body: formData
+                    }
+                );
+
+                if (!res.ok) throw new Error("Upload failed");
+
+                alert("File uploaded successfully!");
+                document.getElementById("questionSection").style.display = "block";
+            } catch (err) {
+                alert("Error uploading file");
+                console.error(err);
+            }
+        }
+
+        async function askQuestion() {
+            const question = document.getElementById("questionInput").value;
+            const responseDiv = document.getElementById("response");
+
+            if (!question) {
+                alert("Please enter a question");
+                return;
+            }
+
+            responseDiv.innerHTML = "Loading...";
+
+            try {
+                const res = await fetch(
+                    "https://6b8ce6bdd3de.ngrok-free.app/ask",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            question: question
+                        })
+                    }
+                );
+
+                const data = await res.json();
+                responseDiv.innerHTML = `<strong>Answer:</strong> ${data.answer || JSON.stringify(data)}`;
+            } catch (err) {
+                responseDiv.innerHTML = "Error fetching answer";
+                console.error(err);
+            }
+        }
+    </script>
+
+</body>
+
+</html>

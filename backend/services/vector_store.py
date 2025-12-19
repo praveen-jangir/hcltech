@@ -46,8 +46,19 @@ class VectorStore:
         return len(chunks)
 
     def query_documents(self, query, n_results=3):
+        try:
+            embedding_result = genai.embed_content(
+                model="models/embedding-001",
+                content=query,
+                task_type="retrieval_query"
+            )
+            query_embedding = embedding_result['embedding']
+        except Exception as e:
+            print(f"Query embedding failed: {e}")
+            return ""
+
         results = self.collection.query(
-            query_texts=[query],
+            query_embeddings=[query_embedding],
             n_results=n_results
         )
         if results['documents']:

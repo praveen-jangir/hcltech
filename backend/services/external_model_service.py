@@ -1,9 +1,14 @@
 
 import requests
 import os
+import logging
+
+logger = logging.getLogger(__name__)
+if not logger.handlers:
+    logging.basicConfig(level=logging.INFO)
 
 class ExternalModelService:
-    def __init__(self, base_url="https://30891ef1ec5d.ngrok-free.app"):
+    def __init__(self, base_url="https://6b8ce6bdd3de.ngrok-free.app"):
         self.base_url = base_url
 
     def set_base_url(self, new_url):
@@ -34,14 +39,18 @@ class ExternalModelService:
         payload = {'question': query}
         
         try:
-            print(f"POSTing to {url} with query: {query}")
-            response = requests.post(url, json=payload, headers=headers, timeout=60) # Increased timeout
+            logger.info(f"POSTing to {url} with query: {query}")
+            response = requests.post(url, json=payload, headers=headers, timeout=60)
             
             if response.status_code != 200:
-                 print(f"External Ask Failed: {response.status_code} - {response.text}")
+                logger.error(f"External Ask Failed: {response.status_code} - {response.text}")
 
             response.raise_for_status()
-            return response.json()
+            try:
+                return response.json()
+            except ValueError:
+                logger.warning("Response is not JSON; returning raw text.")
+                return {"answer": response.text, "raw_response": response.text}
         except Exception as e:
-            print(f"External Query Exception: {e}")
+            logger.exception("External Query Exception")
             return {"answer": f"External error: {str(e)}", "error": str(e)}

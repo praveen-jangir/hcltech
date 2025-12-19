@@ -8,8 +8,9 @@ class LLMEngine:
 
     def generate_answer(self, query, context):
         prompt = f"""
-        Answer only using the information given below.If the information is not available, respond with:
-        "I don't have enough information in the uploaded documents."
+        You are a helpful assistant. Use the provided context to answer the user's question.
+        If the answer is not explicitly in the context, try to summarize the context or be helpful based on the document content.
+        If the document is empty or unreadable, say so.
         
         Context:
         {context}
@@ -19,6 +20,7 @@ class LLMEngine:
         Answer:
         """
         try:
+            print(f"--- LLM PROMPT ---\n{prompt}\n------------------")
             response = self.model.generate_content(prompt)
             return response.text
         except Exception as e:

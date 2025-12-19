@@ -1,9 +1,12 @@
 from flask import Flask, request
 from flask_restx import Api, Resource
 from flask_cors import CORS
+import logging
 
 app = Flask(__name__)
 CORS(app)
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 api = Api(app, version='1.0', title='Excellent Mirror API',
     description='Backend API for the HCL Tech Hackathon project',
@@ -16,7 +19,6 @@ ns = api.namespace('api', description='Core operations')
 class Health(Resource):
     @ns.doc('health_check')
     def get(self):
-        """Health check endpoint"""
         return {'status': 'healthy', 'message': 'Excellent Mirror Backend is runninng'}
 
 
@@ -34,12 +36,14 @@ from services.llm_engine import LLMEngine
 from services.evaluation_service import EvaluationService
 from services.external_model_service import ExternalModelService
 
-GEMINI_API_KEY = "AIzaSyDLqhoMwfr2VFIPH3UlouR-xF60PhG_CwQ"
+GEMINI_API_KEY = "AIzaSyCMWY2XSlDRhbDhJ9x9oZne057u8GGnfDw"
 
 vector_store = VectorStore(api_key=GEMINI_API_KEY)
 llm_engine = LLMEngine(api_key=GEMINI_API_KEY)
 evaluation_service = EvaluationService(api_key=GEMINI_API_KEY)
-external_service = ExternalModelService()
+
+# Global variable to store latest document text (Direct Mode)
+LATEST_DOCUMENT_TEXT = ""
 
 mongo_client = MongoClient("mongodb://localhost:27017/")
 db = mongo_client["hcl_tech_rag"]
@@ -59,6 +63,11 @@ class Upload(Resource):
         file = request.files['file']
         if file.filename == '':
             return {'error': 'No selected file'}, 400
+        
+        # Restrict to PDF files only
+        if not file.filename.lower().endswith('.pdf'):
+            logger.warning(f"Rejected upload of non-PDF file: {file.filename}")
+            return {'error': 'Only PDF files are supported'}, 400
             
         if file:
             filename = file.filename
@@ -67,22 +76,35 @@ class Upload(Resource):
             
             try:
                 extracted_text = DocumentProcessor.extract_text(filepath)
-                chunks = DocumentProcessor.chunk_text(extracted_text)
-                vector_store.add_documents(chunks, filename)
+                global LATEST_DOCUMENT_TEXT
+                LATEST_DOCUMENT_TEXT = extracted_text
+                print(f"DEBUG: Extracted text length: {len(LATEST_DOCUMENT_TEXT)}")
+                print(f"DEBUG: Extracted text preview: {LATEST_DOCUMENT_TEXT[:500]}")
+
+                # Vector store disabled for Direct Mode
+                # chunks = DocumentProcessor.chunk_text(extracted_text)
+                # print(chunks)
+                # vector_store.add_documents(chunks, filename)
                 
-                print("Uploading to external model...")
-                ext_response = external_service.upload_file(filepath)
-                print(f"External Upload Response: {ext_response}")
+                # External upload disabled
+                # logger.info(f"Uploading {filename} to external model...")
+                # try:
+                #     ext_response = external_service.upload_file(filepath)
+                #     logger.info(f"External upload succeeded: {ext_response}")
+                # except Exception as e:
+                #     logger.error(f"External upload failed: {e}")
+                #     ext_response = {"error": str(e)}
+                ext_response = {"status": "disabled", "message": "External model disabled by user"}
 
                 uploads_col.insert_one({
                     "filename": filename,
                     "upload_time": datetime.utcnow(),
-                    "chunks_count": len(chunks),
+                    "chunks_count": 1, # Treated as single chunk in direct mode
                     "status": "processed",
                     "external_status": ext_response
                 })
 
-                return {'message': f'File processed locally and sent to external model!', 'filename': filename}, 200
+                return {'message': 'File processed locally and external upload attempted', 'filename': filename, 'external_status': ext_response}, 200
 
             except Exception as e:
                 return {'error': f'Processing Failed: {str(e)}'}, 500
@@ -98,14 +120,26 @@ class Ask(Resource):
             return {'error': 'No query provided'}, 400
             
         try:
-            rewritten_query = llm_engine.rewrite_query(query)
-            context = vector_store.query_documents(rewritten_query)
+            # Direct Mode: Use global text
+            global LATEST_DOCUMENT_TEXT
+            if not LATEST_DOCUMENT_TEXT:
+                return {'error': 'No document uploaded. Please upload a PDF first.'}, 400
+            
+            context = LATEST_DOCUMENT_TEXT
+            
+            # Vector store query disabled
+            # rewritten_query = llm_engine.rewrite_query(query)
+            # context = vector_store.query_documents(rewritten_query)
+            rewritten_query = query # No rewrite in direct mode
             answer_internal = llm_engine.generate_answer(query, context)
             metrics_internal = evaluation_service.evaluate_all(query, context, answer_internal)
             
-            print("Querying external model...")
-            ext_data = external_service.ask_question(query)
-            answer_external = ext_data.get('answer', 'No answer from external model')
+            # External query disabled
+            # print("Querying external model...")
+            # ext_data = external_service.ask_question(query)
+            # answer_external = ext_data.get('answer', 'No answer from external model')
+            answer_external = "External model disabled"
+            ext_data = {}
             
             chats_col.insert_one({
                 "query": query,

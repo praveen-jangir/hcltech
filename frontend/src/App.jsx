@@ -206,15 +206,7 @@ function App() {
                             )}
                           </div>
 
-                          <div className="model-card external-model">
-                            <div className="model-header">
-                              <span className="badge external">runing in gpu model name is deberta-v3-large</span>
-                            </div>
-                            <div className="model-body">
-                              {msg.external?.answer || "No response received."}
-                            </div>
 
-                          </div>
                         </div>
                       )}
                     </div>
