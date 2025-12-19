@@ -1,0 +1,96 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+/* Global Font */
+html,
+body,
+[class*="css"] {
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Main Background */
+.stApp {
+    background-color: #ffffff;
+    color: #333333;
+}
+
+/* Hide Sidebar */
+section[data-testid="stSidebar"] {
+    display: none;
+}
+
+/* Headers */
+h1,
+h2,
+h3 {
+    color: #00bfff !important;
+    /* DeepSkyBlue */
+    font-weight: 600;
+}
+
+/* Text */
+p,
+li,
+.stMarkdown {
+    color: #4a4a4a;
+    font-weight: 300;
+    font-size: 1.1rem;
+}
+
+/* Buttons */
+.stButton>button {
+    color: white;
+    background: linear-gradient(to right, #87ceeb, #00bfff);
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    transition: transform 0.2s;
+}
+
+.stButton>button:hover {
+    background: linear-gradient(to right, #00bfff, #00ced1);
+    border: none;
+    transform: scale(1.05);
+}
+
+/* Info Boxes */
+.stAlert {
+    background-color: #e0f7fa;
+    color: #006064;
+    border-left: 4px solid #00bfff;
+}
+
+/* Custom Cards */
+.feature-card {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: transform 0.3s ease;
+    height: 100%;
+    border: 1px solid #e0f7fa;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+}
+
+.feature-icon {
+    font-size: 2.5rem;
+    color: #00bfff;
+    margin-bottom: 15px;
+}
+
+.feature-title {
+    color: #00bfff;
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.feature-desc {
+    color: #666;
+    font-size: 0.95rem;
+}
