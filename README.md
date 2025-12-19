@@ -117,11 +117,11 @@ The system uses **MongoDB** to store chat history (`chats` collection) and file 
 
 ### Chat History Schema (`chats`)
 Stores every user query, the internal RAG response (with metrics), and the external model response.
-![Chat History Collection](file:///Users/excellentmirror/.gemini/antigravity/brain/892d36a7-f2e0-4eee-949e-4b8a30240d52/uploaded_image_0_1766147556929.png)
+![Chat History Collection](public/assets/images/mongo_chats.png)
 
 ### File Uploads Schema (`uploads`)
 Tracks all uploaded files, their processing status, chunk counts, and timestamps.
-![Uploads Collection](file:///Users/excellentmirror/.gemini/antigravity/brain/892d36a7-f2e0-4eee-949e-4b8a30240d52/uploaded_image_1_1766147556929.png)
+![Uploads Collection](public/assets/images/mongo_uploads.png)
 
 ---
 
