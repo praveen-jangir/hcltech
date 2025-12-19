@@ -7,10 +7,9 @@ class LLMEngine:
         self.model = genai.GenerativeModel(model_name)
 
     def generate_answer(self, query, context):
-        """Generates an answer using the LLM based on context."""
         prompt = f"""
-        You are an expert assistant. Answer the question based strictly on the provided context below.
-        If the answer isn't in the context, say "I don't have enough information in the uploaded documents."
+        Answer only using the information given below.If the information is not available, respond with:
+        "I don't have enough information in the uploaded documents."
         
         Context:
         {context}
@@ -26,10 +25,8 @@ class LLMEngine:
             return f"Error generating answer: {str(e)}"
 
     def rewrite_query(self, query):
-        """Rewrites the user query to be more suitable for vector retrieval."""
         prompt = f"""
-        Act as a search engine optimizer. Rewrite the following user query to be more specific and keyword-rich for retrieving technical documentation.
-        Do not add any preamble or quotes. Just the rewritten query.
+        Rewrite the query to improve technical document retrieval. Output only the rewritten query.
         
         Original Query: {query}
         
@@ -42,27 +39,16 @@ class LLMEngine:
             return query # Fallback to original
 
     def evaluate_response(self, query, context, answer):
-        """Evaluates the RAG response for Precision, Recall, and F1."""
-        # Note: True Precision/Recall requires ground truth. Here we use LLM-as-a-Judge to estimate quality.
         prompt = f"""
-        You are an expert evaluator for a RAG system.
-        Evaluate the quality of the generated answer based on the retrieved context and original question.
+        Evaluate the RAG answer using the question and retrieved context.
         
         Question: {query}
         Context: {context}
         Generated Answer: {answer}
         
-        Provide a JSON response with the following integer scores (0-100):
-        - precision: How much of the answer is supported by the context?
-        - recall: How much of the question was answered by the context?
-        - f1_score: Harmonic mean of precision and recall.
+
         
-        Format:
-        {{
-            "precision": 85,
-            "recall": 90,
-            "f1_score": 87
-        }}
+        
         Return ONLY valid JSON.
         """
         try:
